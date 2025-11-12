@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seismic-producer
+  namespace: seismic-monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seismic-producer
+  template:
+    metadata:
+      labels:
+        app: seismic-producer
+    spec:
+      containers:
+        - name: producer
+          image: seismic-producer:latest
+          imagePullPolicy: IfNotPresent  # For local development
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka-service:9092"
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1000m"
+            limits:
+              memory: "4Gi"
+              cpu: "2000m"

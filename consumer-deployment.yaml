@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seismic-consumer
+  namespace: seismic-monitoring
+spec:
+  replicas: 2  # Scale for high availability
+  selector:
+    matchLabels:
+      app: seismic-consumer
+  template:
+    metadata:
+      labels:
+        app: seismic-consumer
+    spec:
+      containers:
+        - name: consumer
+          image: seismic-consumer:latest
+          imagePullPolicy: IfNotPresent  # For local development
+          ports:
+            - containerPort: 5000
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka-service:9092"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+
+---
+# Consumer Service (LoadBalancer for external access)
+apiVersion: v1
+kind: Service
+metadata:
+  name: seismic-frontend
+  namespace: seismic-monitoring
+spec:
+  type: LoadBalancer
+  selector:
+    app: seismic-consumer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000

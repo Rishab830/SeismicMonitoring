@@ -1,0 +1,5 @@
+obspy>=1.4.0
+seisbench>=0.4.0
+numpy>=1.21.0
+matplotlib>=3.5.0
+kafka-python>=2.0.2

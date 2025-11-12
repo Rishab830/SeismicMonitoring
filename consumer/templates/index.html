@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seismic Monitoring Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .control-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .results {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .result-header {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .result-header h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .result-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .meta-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .meta-item strong {
+            display: block;
+            color: #667eea;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .meta-item span {
+            font-size: 1.1rem;
+            color: #333;
+        }
+        
+        .plot-container {
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .plot-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .picks-section {
+            margin-top: 30px;
+        }
+        
+        .picks-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .picks-table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+        
+        .picks-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .picks-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .picks-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .phase-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .phase-p {
+            background: #4299e1;
+            color: white;
+        }
+        
+        .phase-s {
+            background: #f56565;
+            color: white;
+        }
+        
+        .confidence-bar {
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            transition: width 0.3s;
+        }
+        
+        .no-picks {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .error {
+            background: #fff5f5;
+            border: 2px solid #fc8181;
+            color: #c53030;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 Global Seismic Monitoring Dashboard</h1>
+            <p>Real-time earthquake detection powered by PhaseNet AI</p>
+        </div>
+        
+        <div class="control-panel">
+            <div class="form-group">
+                <label for="station-select">Select Seismic Station:</label>
+                <select id="station-select">
+                    <option value="">-- Loading stations --</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="loadSeismicData()">
+                📊 Load Seismic Data
+            </button>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Fetching seismic data...</p>
+        </div>
+        
+        <div class="error" id="error"></div>
+        
+        <div class="results" id="results">
+            <div class="result-header">
+                <h2 id="station-title"></h2>
+                <p id="station-location"></p>
+            </div>
+            
+            <div class="result-meta">
+                <div class="meta-item">
+                    <strong>Timestamp</strong>
+                    <span id="timestamp"></span>
+                </div>
+                <div class="meta-item">
+                    <strong>Time Window</strong>
+                    <span id="time-window"></span>
+                </div>
+                <div class="meta-item">
+                    <strong>Picks Detected</strong>
+                    <span id="num-picks"></span>
+                </div>
+                <div class="meta-item">
+                    <strong>Sampling Rate</strong>
+                    <span id="sampling-rate"></span>
+                </div>
+            </div>
+            
+            <div class="plot-container">
+                <img id="seismic-plot" alt="Seismic Waveform" />
+            </div>
+            
+            <div class="picks-section">
+                <h3>Detected Seismic Phases</h3>
+                <div id="picks-container"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const stations = {
+            "GE.SUMG": "Summit Camp, Greenland",
+            "IU.AFI": "Afiamalu, Samoa",
+            "IU.ANMO": "Albuquerque, New Mexico, USA",
+            "IU.ANTO": "Ankara, Turkey",
+            "IU.BBSR": "St. George's, Bermuda",
+            "IU.COLA": "College Outpost, Alaska, USA",
+            "IU.CTAO": "Charters Towers, Australia",
+            "IU.FURI": "Mt. Furi, Ethiopia",
+            "IU.GUMO": "Guam, Mariana Islands",
+            "IU.HRV": "Adam Dziewonski Observatory, Massachusetts, USA",
+            "IU.KONO": "Kongsberg, Norway",
+            "IU.LSZ": "Lusaka, Zambia",
+            "IU.MAJO": "Matsushiro, Japan",
+            "IU.PAB": "San Pablo, Spain",
+            "IU.PMSA": "Palmer Station, Antarctica",
+            "IU.POHA": "Pohakuloa, Hawaii, USA",
+            "IU.RAR": "Rarotonga, Cook Islands",
+            "IU.SFJD": "Sondre Stromfjord, Greenland",
+            "IU.SSPA": "Standing Stone, Pennsylvania, USA",
+            "IU.TATO": "Taipei, Taiwan",
+            "IU.TRIS": "Tristan da Cunha",
+            "IU.ULN": "Ulaanbaatar, Mongolia",
+            "IU.WCI": "Wyandotte Cave, Indiana, USA",
+            "IU.WVT": "Waverly, Tennessee, USA",
+            "BK.CMB": "Columbia College, California, USA"
+        };
+        
+        // Populate station dropdown
+        window.onload = function() {
+            const select = document.getElementById('station-select');
+            select.innerHTML = '<option value="">-- Select a station --</option>';
+            
+            for (const [code, name] of Object.entries(stations)) {
+                const option = document.createElement('option');
+                option.value = code;
+                option.textContent = `${code} - ${name}`;
+                select.appendChild(option);
+            }
+        };
+        
+        async function loadSeismicData() {
+            const stationCode = document.getElementById('station-select').value;
+            
+            if (!stationCode) {
+                showError('Please select a station first!');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            
+            try {
+                const response = await fetch(`/api/seismic-data/${stationCode}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayResults(result.data, stationCode);
+                } else {
+                    showError(result.message);
+                }
+            } catch (error) {
+                showError('Failed to load data: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+        
+        function displayResults(data, stationCode) {
+            // Update header
+            document.getElementById('station-title').textContent = stationCode;
+            document.getElementById('station-location').textContent = stations[stationCode];
+            
+            // Update metadata with null checks
+            document.getElementById('timestamp').textContent = 
+                data.timestamp ? new Date(data.timestamp).toLocaleString() : 'N/A';
+            
+            document.getElementById('time-window').textContent = 
+                data.start_time && data.end_time 
+                    ? `${formatTime(data.start_time)} to ${formatTime(data.end_time)}`
+                    : 'N/A';
+            
+            document.getElementById('num-picks').textContent = 
+                data.num_picks !== undefined ? data.num_picks : 'N/A';
+            
+            document.getElementById('sampling-rate').textContent = 
+                data.stream_info && data.stream_info.sampling_rate 
+                    ? `${data.stream_info.sampling_rate} Hz`
+                    : 'N/A';
+            
+            // Display plot with error handling
+            if (data.plot_image) {
+                document.getElementById('seismic-plot').src = 
+                    `data:image/png;base64,${data.plot_image}`;
+                document.getElementById('seismic-plot').style.display = 'block';
+            } else {
+                document.getElementById('seismic-plot').style.display = 'none';
+            }
+            
+            // Display picks
+            displayPicks(data.picks || []);
+            
+            // Show error message if status is failed
+            if (data.status === 'failed' || data.error) {
+                showError(`Station processing failed: ${data.error || 'Unknown error'}`);
+            }
+            
+            // Show results
+            document.getElementById('results').style.display = 'block';
+        }
+
+        
+        function displayPicks(picks) {
+            const container = document.getElementById('picks-container');
+            
+            if (!picks || picks.length === 0) {
+                container.innerHTML = '<div class="no-picks">No seismic phases detected in this time window.</div>';
+                return;
+            }
+            
+            let html = '<table class="picks-table"><thead><tr>';
+            html += '<th>Phase</th><th>Time</th><th>Confidence</th><th>Duration</th><th>Trace ID</th>';
+            html += '</tr></thead><tbody>';
+            
+            picks.forEach(pick => {
+                const phaseClass = pick.phase === 'P' ? 'phase-p' : 'phase-s';
+                const confidence = pick.confidence ? (pick.confidence * 100).toFixed(1) : 'N/A';
+                const duration = pick.duration ? pick.duration.toFixed(2) : 'N/A';
+                
+                html += '<tr>';
+                html += `<td><span class="phase-badge ${phaseClass}">${pick.phase || 'Unknown'}-wave</span></td>`;
+                html += `<td>${formatTime(pick.time)}</td>`;
+                html += `<td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="confidence-bar" style="flex: 1;">
+                            <div class="confidence-fill" style="width: ${confidence}%"></div>
+                        </div>
+                        <span>${confidence}%</span>
+                    </div>
+                </td>`;
+                html += `<td>${duration}s</td>`;
+                html += `<td>${pick.trace_id || 'N/A'}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        
+        function formatTime(timeStr) {
+            if (!timeStr) return 'N/A';  // Handle undefined/null
+            try {
+                return timeStr.split('.')[0].replace('T', ' ');
+            } catch (e) {
+                return 'N/A';
+            }
+        }
+
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
