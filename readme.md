@@ -17,11 +17,16 @@
     - this pushes the producer image to the repository skillissue1212 as seismic-producer:latest
 4) docker push skillissue1212/seismic-consumer:latest
     - this pushes the consumer image to the repository skillissue1212 as seismic-consumer:latest
+# Creating Namespace
+1) kubectl create namespace seismic-monitoring
+    - creates a kubernetes namespace called seismic-monitoring
 # Making Deployments Out Of My Images
 1) kubectl apply -f producer-deployment.yaml
     - creates a producer deployment out of the seismic-producer:latest image
 2) kubectl apply -f consumer-deployment.yaml
     - creates a consumer deployment out of the seismic-consumer:latest image
+3) kubectl apply -f kafka-deployment.yaml
+    - - creates a kafka deployment out of the kafka and zookeeper image
 # Check Running Containers
 1) docker ps -a
     - Prints information about all running containers
