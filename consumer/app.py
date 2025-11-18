@@ -89,8 +89,9 @@ def get_stations():
 def get_seismic_data(station_code):
     """Get the latest seismic data for a specific station."""
     with data_lock:
+        print(seismic_data_store.keys())
         data = seismic_data_store.get(station_code)
-    
+
     if data:
         return jsonify({
             'success': True,

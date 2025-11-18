@@ -4,7 +4,7 @@ metadata:
   name: seismic-consumer
   namespace: seismic-monitoring
 spec:
-  replicas: 2  # Scale for high availability
+  replicas: 1  # Scale for high availability
   selector:
     matchLabels:
       app: seismic-consumer

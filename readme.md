@@ -33,6 +33,10 @@
 # Info About Pods
 1) kubectl get pods -n seismic-monitoring -w
     - keep a watch on the pods in namespace seismic-monitoring
+2) kubectl logs -f deployment/seismic-producer -n seismic-monitoring
+    - gets all the logs from producer container
+3) kubectl logs -f deployment/seismic-consumer -n seismic-monitoring
+    - gets all the logs from consumer container
 # Get IP of Front End
 1) kubectl get svc seismic-frontend -n seismic-monitoring
     - to see what is the current port the service is connected to

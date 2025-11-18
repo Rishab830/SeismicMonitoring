@@ -24,14 +24,9 @@ kubectl delete service zookeeper-service -n seismic-monitoring 2>nul
 echo ✓ Services deleted
 echo.
 
-echo [4/5] Deleting namespaces...
-kubectl delete namespace seismic-monitoring 2>nul
-echo ✓ Seismic namespace deleted
-echo.
-
-echo [5/5] Deleting ingress controller namespace...
-kubectl delete namespace ingress-nginx 2>nul
-echo ✓ Ingress controller deleted
+echo [4/5] Deleting ingress...
+kubectl delete namespace ingress-nginx
+echo ✓ Ingress deleted
 echo.
 
 echo ============================================
