@@ -170,7 +170,7 @@ class SeismicDataProducer:
             self.producer.send('seismic-data', error_data)
             return False
     
-    def run_continuous(self, station_list, interval_seconds=300):
+    def run_continuous(self, station_list, interval_seconds=60):
         """Continuously process stations in a loop."""
         print(f"Starting continuous monitoring...")
         print(f"Stations: {', '.join(station_list)}")
@@ -197,4 +197,4 @@ if __name__ == "__main__":
     producer = SeismicDataProducer(kafka_bootstrap_servers=kafka_server)
     
     # Run continuously
-    producer.run_continuous(working_stations, interval_seconds=600)
+    producer.run_continuous(working_stations, interval_seconds=60)

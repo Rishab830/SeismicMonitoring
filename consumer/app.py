@@ -60,6 +60,7 @@ def kafka_consumer_thread():
         if station_code:
             with data_lock:
                 seismic_data_store[station_code] = data
+                print(seismic_data_store.keys())
             print(f"✓ Received data for {station_code} - {len(data.get('picks', []))} picks")
 
 # Start Kafka consumer in background thread
@@ -124,4 +125,4 @@ def health():
     })
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)
