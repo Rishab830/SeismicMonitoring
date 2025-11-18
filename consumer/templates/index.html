@@ -15,12 +15,69 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding-top: 80px;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+        
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            transition: color 0.3s;
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+        
+        .nav-menu a:hover {
+            color: #667eea;
+            background: #f8f9fa;
+        }
+        
+        .nav-menu a.active {
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 20px;
         }
         
         .header {
@@ -264,6 +321,19 @@
     </style>
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <span>🌍</span> Seismic Monitor
+            </a>
+            <ul class="nav-menu">
+                <li><a href="/" class="active">Dashboard</a></li>
+                <li><a href="/about">Learn More</a></li>
+            </ul>
+        </div>
+    </nav>
+
     <div class="container">
         <div class="header">
             <h1>🌍 Global Seismic Monitoring Dashboard</h1>
@@ -298,7 +368,7 @@
             
             <div class="result-meta">
                 <div class="meta-item">
-                    <strong>Location Timestamp</strong>
+                    <strong>Processing Timestamp</strong>
                     <span id="timestamp"></span>
                 </div>
                 <div class="meta-item">
@@ -351,7 +421,6 @@
             "BK.CMB": "Columbia College, California, USA"
         };
         
-        // Populate station dropdown
         window.onload = function() {
             const select = document.getElementById('station-select');
             select.innerHTML = '<option value="">-- Select a station --</option>';
@@ -372,7 +441,6 @@
                 return;
             }
             
-            // Show loading
             document.getElementById('loading').style.display = 'block';
             document.getElementById('results').style.display = 'none';
             document.getElementById('error').style.display = 'none';
@@ -394,11 +462,9 @@
         }
         
         function displayResults(data, stationCode) {
-            // Update header
             document.getElementById('station-title').textContent = stationCode;
             document.getElementById('station-location').textContent = stations[stationCode];
             
-            // Update metadata with null checks
             document.getElementById('timestamp').textContent = 
                 data.timestamp ? new Date(data.timestamp).toLocaleString() : 'N/A';
             
@@ -415,7 +481,6 @@
                     ? `${data.stream_info.sampling_rate} Hz`
                     : 'N/A';
             
-            // Display plot with error handling
             if (data.plot_image) {
                 document.getElementById('seismic-plot').src = 
                     `data:image/png;base64,${data.plot_image}`;
@@ -424,18 +489,14 @@
                 document.getElementById('seismic-plot').style.display = 'none';
             }
             
-            // Display picks
             displayPicks(data.picks || []);
             
-            // Show error message if status is failed
             if (data.status === 'failed' || data.error) {
                 showError(`Station processing failed: ${data.error || 'Unknown error'}`);
             }
             
-            // Show results
             document.getElementById('results').style.display = 'block';
         }
-
         
         function displayPicks(picks) {
             const container = document.getElementById('picks-container');
@@ -473,17 +534,15 @@
             html += '</tbody></table>';
             container.innerHTML = html;
         }
-
         
         function formatTime(timeStr) {
-            if (!timeStr) return 'N/A';  // Handle undefined/null
+            if (!timeStr) return 'N/A';
             try {
                 return timeStr.split('.')[0].replace('T', ' ');
             } catch (e) {
                 return 'N/A';
             }
         }
-
         
         function showError(message) {
             const errorDiv = document.getElementById('error');

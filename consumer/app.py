@@ -6,12 +6,15 @@ import threading
 from datetime import datetime
 import os
 
+
 app = Flask(__name__)
 CORS(app)
+
 
 # In-memory storage for latest seismic data
 seismic_data_store = {}
 data_lock = threading.Lock()
+
 
 # Station list
 STATIONS = {
@@ -38,6 +41,7 @@ STATIONS = {
     "BK.CMB": "Columbia College, California, USA"
 }
 
+
 def kafka_consumer_thread():
     """Background thread to consume Kafka messages."""
     kafka_server = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'kafka-service:9092')
@@ -60,17 +64,25 @@ def kafka_consumer_thread():
         if station_code:
             with data_lock:
                 seismic_data_store[station_code] = data
-                print(seismic_data_store.keys())
             print(f"✓ Received data for {station_code} - {len(data.get('picks', []))} picks")
+
 
 # Start Kafka consumer in background thread
 consumer_thread = threading.Thread(target=kafka_consumer_thread, daemon=True)
 consumer_thread.start()
 
+
 @app.route('/')
 def index():
     """Serve the main frontend page."""
     return render_template('index.html')
+
+
+@app.route('/about')
+def about():
+    """Serve the about/education page."""
+    return render_template('about.html')
+
 
 @app.route('/api/stations')
 def get_stations():
@@ -82,11 +94,11 @@ def get_stations():
         ]
     })
 
+
 @app.route('/api/seismic-data/<station_code>')
 def get_seismic_data(station_code):
     """Get the latest seismic data for a specific station."""
     with data_lock:
-        print(seismic_data_store.keys())
         data = seismic_data_store.get(station_code)
 
     if data:
@@ -100,6 +112,7 @@ def get_seismic_data(station_code):
             'message': f'No data available for station {station_code} yet. Please wait for the next processing cycle.'
         }), 404
 
+
 @app.route('/api/all-data')
 def get_all_data():
     """Get all available seismic data."""
@@ -112,6 +125,7 @@ def get_all_data():
         'data': all_data
     })
 
+
 @app.route('/api/health')
 def health():
     """Health check endpoint."""
@@ -123,6 +137,7 @@ def health():
         'stations_with_data': data_count,
         'total_stations': len(STATIONS)
     })
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
