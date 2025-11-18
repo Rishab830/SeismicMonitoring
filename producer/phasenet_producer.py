@@ -186,10 +186,10 @@ class SeismicDataProducer:
 
 if __name__ == "__main__":
     working_stations = [
-        "GE.SUMG", "IU.AFI", "IU.ANMO", "IU.ANTO", "IU.BBSR",
-        "IU.COLA", "IU.CTAO", "IU.FURI", "IU.GUMO", "IU.HRV",
-        "IU.KONO", "IU.LSZ", "IU.MAJO", "IU.PAB", "IU.PMSA",
-        "IU.POHA", "IU.RAR", "IU.SFJD", "IU.SSPA", "IU.TATO",
+        "IU.ANMO", "IU.ANTO", "IU.BBSR", "IU.TATO",
+        "IU.CTAO", "IU.GUMO", "IU.HRV", "IU.PMSA",
+        "IU.KONO", "IU.LSZ", "IU.MAJO", "IU.PAB",
+        "IU.POHA", "IU.RAR", "IU.SFJD", "IU.SSPA",
         "IU.TRIS", "IU.ULN", "IU.WCI", "IU.WVT", "BK.CMB"
     ]
     

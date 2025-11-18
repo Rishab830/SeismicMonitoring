@@ -36,4 +36,5 @@ echo.
 echo All resources have been removed from Kubernetes.
 echo Docker images are preserved for faster restart.
 echo.
+kubectl get pods -n seismic-monitoring -w
 pause

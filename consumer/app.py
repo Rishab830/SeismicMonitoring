@@ -15,14 +15,10 @@ data_lock = threading.Lock()
 
 # Station list
 STATIONS = {
-    "GE.SUMG": "Summit Camp, Greenland",
-    "IU.AFI": "Afiamalu, Samoa",
     "IU.ANMO": "Albuquerque, New Mexico, USA",
     "IU.ANTO": "Ankara, Turkey",
     "IU.BBSR": "St. George's, Bermuda",
-    "IU.COLA": "College Outpost, Alaska, USA",
     "IU.CTAO": "Charters Towers, Australia",
-    "IU.FURI": "Mt. Furi, Ethiopia",
     "IU.GUMO": "Guam, Mariana Islands",
     "IU.HRV": "Adam Dziewonski Observatory, Massachusetts, USA",
     "IU.KONO": "Kongsberg, Norway",
