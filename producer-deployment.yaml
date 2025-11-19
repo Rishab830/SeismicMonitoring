@@ -16,7 +16,7 @@ spec:
       containers:
         - name: producer
           image: seismic-producer:latest
-          imagePullPolicy: IfNotPresent  # For local development
+          imagePullPolicy: IfNotPresent
           env:
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: "kafka-service:9092"

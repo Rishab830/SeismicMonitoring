@@ -11,12 +11,10 @@ app = Flask(__name__)
 CORS(app)
 
 
-# In-memory storage for latest seismic data
 seismic_data_store = {}
 data_lock = threading.Lock()
 
 
-# Station list
 STATIONS = {
     "IU.ANMO": "Albuquerque, New Mexico, USA",
     "IU.ANTO": "Ankara, Turkey",
@@ -54,7 +52,7 @@ def kafka_consumer_thread():
         group_id='seismic-consumer-group'
     )
     
-    print(f"✓ Consumer connected to Kafka at {kafka_server}")
+    print(f"Consumer connected to Kafka at {kafka_server}")
     print("Waiting for messages...")
     
     for message in consumer:
@@ -64,10 +62,9 @@ def kafka_consumer_thread():
         if station_code:
             with data_lock:
                 seismic_data_store[station_code] = data
-            print(f"✓ Received data for {station_code} - {len(data.get('picks', []))} picks")
+            print(f"Received data for {station_code} - {len(data.get('picks', []))} picks")
 
 
-# Start Kafka consumer in background thread
 consumer_thread = threading.Thread(target=kafka_consumer_thread, daemon=True)
 consumer_thread.start()
 

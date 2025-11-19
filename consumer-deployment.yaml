@@ -4,7 +4,7 @@ metadata:
   name: seismic-consumer
   namespace: seismic-monitoring
 spec:
-  replicas: 1  # Scale for high availability
+  replicas: 1
   selector:
     matchLabels:
       app: seismic-consumer
@@ -16,7 +16,7 @@ spec:
       containers:
         - name: consumer
           image: seismic-consumer:latest
-          imagePullPolicy: IfNotPresent  # For local development
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
           env:
@@ -31,7 +31,6 @@ spec:
               cpu: "500m"
 
 ---
-# Consumer Service (LoadBalancer for external access)
 apiVersion: v1
 kind: Service
 metadata:

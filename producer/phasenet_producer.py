@@ -2,7 +2,7 @@ import seisbench.models as sbm
 from obspy.clients.fdsn import Client
 from obspy import UTCDateTime
 import matplotlib
-matplotlib.use('Agg')  # Non-interactive backend
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import json
 import base64
@@ -20,9 +20,9 @@ class SeismicDataProducer:
         self.producer = KafkaProducer(
             bootstrap_servers=kafka_bootstrap_servers,
             value_serializer=lambda v: json.dumps(v).encode('utf-8'),
-            max_request_size=10485760  # 10MB for large images
+            max_request_size=10485760 
         )
-        print(f"✓ Producer initialized, connected to Kafka at {kafka_bootstrap_servers}")
+        print(f"Producer initialized, connected to Kafka at {kafka_bootstrap_servers}")
     
     def plot_waveform_with_probabilities(self, stream, annotations, picks, station_code):
         """Generate plot and return as base64 encoded string."""
@@ -36,7 +36,6 @@ class SeismicDataProducer:
             
             fig, ax1 = plt.subplots(figsize=(15, 6))
             
-            # Plot waveform
             ax1.plot(waveform_times, waveform.data, 'k-', linewidth=0.5, 
                     label='Waveform (Z)', alpha=0.7)
             ax1.set_xlabel('Time (seconds)', fontsize=12)
@@ -44,7 +43,6 @@ class SeismicDataProducer:
             ax1.tick_params(axis='y', labelcolor='k')
             ax1.grid(True, alpha=0.3)
             
-            # Plot probabilities
             ax2 = ax1.twinx()
             ax2.plot(prob_times, p_trace.data, 'b-', linewidth=2, 
                     label='P-wave probability', alpha=0.8)
@@ -53,7 +51,6 @@ class SeismicDataProducer:
             ax2.set_ylabel('Probability', fontsize=12)
             ax2.set_ylim([0, 1])
             
-            # Add pick markers
             if picks and len(picks.picks) > 0:
                 starttime = waveform.stats.starttime
                 for pick in picks.picks:
@@ -65,7 +62,6 @@ class SeismicDataProducer:
                            f'{pick.phase} ({pick.peak_value:.2f})', 
                            color=color, fontsize=10, ha='center')
             
-            # Legends
             lines1, labels1 = ax1.get_legend_handles_labels()
             lines2, labels2 = ax2.get_legend_handles_labels()
             ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper left', fontsize=10)
@@ -74,7 +70,6 @@ class SeismicDataProducer:
             plt.title(title, fontsize=14, fontweight='bold')
             plt.tight_layout()
             
-            # Convert to base64
             buffer = io.BytesIO()
             plt.savefig(buffer, format='png', dpi=150, bbox_inches='tight')
             buffer.seek(0)
@@ -98,7 +93,6 @@ class SeismicDataProducer:
             endtime = UTCDateTime()
             starttime = endtime - (60 * duration_minutes)
             
-            # Fetch data
             print(f"Fetching data from IRIS...")
             stream = self.client.get_waveforms(
                 network=network,
@@ -111,21 +105,18 @@ class SeismicDataProducer:
             
             stream.merge(fill_value=0)
             stream.detrend('linear')
-            print(f"✓ Data fetched: {len(stream)} traces")
+            print(f"Data fetched: {len(stream)} traces")
             
-            # Run PhaseNet
             print(f"Running PhaseNet analysis...")
             annotations = self.model.annotate(stream)
             picks = self.model.classify(stream)
-            print(f"✓ Analysis complete: {len(picks.picks)} picks found")
+            print(f"Analysis complete: {len(picks.picks)} picks found")
             
-            # Generate plot
             print(f"Generating visualization...")
             plot_base64 = self.plot_waveform_with_probabilities(
                 stream, annotations, picks, station_code
             )
             
-            # Prepare data for Kafka
             result_data = {
                 'station_code': station_code,
                 'timestamp': datetime.now().isoformat(),
@@ -140,7 +131,6 @@ class SeismicDataProducer:
                 }
             }
             
-            # Add pick details
             for pick in picks.picks:
                 result_data['picks'].append({
                     'phase': pick.phase,
@@ -150,17 +140,15 @@ class SeismicDataProducer:
                     'trace_id': pick.trace_id
                 })
             
-            # Send to Kafka
             print(f"Sending results to Kafka topic 'seismic-data'...")
             future = self.producer.send('seismic-data', result_data)
-            future.get(timeout=10)  # Wait for confirmation
-            print(f"✓ Results sent to Kafka successfully!")
+            future.get(timeout=10)
+            print(f"Results sent to Kafka successfully!")
             
             return True
             
         except Exception as e:
             print(f"✗ Error processing {station_code}: {e}")
-            # Send error message to Kafka
             error_data = {
                 'station_code': station_code,
                 'timestamp': datetime.now().isoformat(),
@@ -179,7 +167,7 @@ class SeismicDataProducer:
         while True:
             for station_code in station_list:
                 self.process_station(station_code, duration_minutes=5)
-                time.sleep(10)  # Small delay between stations
+                time.sleep(10)
             
             print(f"\n⏰ Cycle complete. Waiting {interval_seconds} seconds before next cycle...")
             time.sleep(interval_seconds)
@@ -196,5 +184,4 @@ if __name__ == "__main__":
     kafka_server = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'kafka-service:9092')
     producer = SeismicDataProducer(kafka_bootstrap_servers=kafka_server)
     
-    # Run continuously
     producer.run_continuous(working_stations, interval_seconds=60)
